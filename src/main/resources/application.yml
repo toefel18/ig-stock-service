@@ -1,0 +1,32 @@
+server:
+  port: 8080
+  # when pod is getting terminated and there are requests in progress
+  # the server will wait for those active requests to finish
+  # time of waiting is defined in next setting timeout-per-shutdown-phase
+  shutdown: graceful
+
+spring:
+  application:
+    name: stock-service
+  lifecycle:
+    timeout-per-shutdown-phase: 5s
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: UTC
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${POSTGRES_USERNAME:stock}
+    password: ${POSTGRES_PASSWORD:stock}
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:9192/stock}
+  jooq:
+    sql-dialect: Postgres
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
+
+reservation-timeout-millis: 300000
+# turns on SQL logging for debugging and optimizing SQL queries.
+#logging:
+#  level:
+#    org.jooq.tools.LoggerListener: DEBUG

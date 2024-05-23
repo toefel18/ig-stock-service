@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: stock-service
+
+# This is a testcontainer driver and URL that will automatically start a postgresql container for tests and shut it down after.
+# Spring will run flyway automatically when tests boot.
+  datasource:
+    username: stock
+    password: stock
+    url: jdbc:tc:postgresql:16.3-alpine:///stock
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+# turns on SQL logging for debugging and optimizing SQL queries.
+#logging:
+#  level:
+#    org.jooq.tools.LoggerListener: DEBUG
