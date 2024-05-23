@@ -6,8 +6,11 @@ import net.intergamma.stock.db.tables.records.StoreStockReservationRecord
 import net.intergamma.stock.db.tables.references.STORE_STOCK
 import net.intergamma.stock.db.tables.references.STORE_STOCK_RESERVATION
 import org.jooq.DSLContext
-import org.jooq.impl.DSL
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.coalesce
+import org.jooq.impl.DSL.select
+import org.jooq.impl.DSL.sum
+import org.jooq.impl.DSL.trueCondition
+import org.jooq.impl.DSL.value
 import org.springframework.stereotype.Repository
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -144,57 +147,3 @@ class StockRepository(val jooq: DSLContext) {
             .execute()
     }
 }
-
-
-//select(DSL.sum(STORE_STOCK.STOCK))
-//.from(STORE_STOCK)
-//.where(
-//STORE_STOCK.STORE_ID.eq(storeId),
-//STORE_STOCK.PRODUCT_ID.eq(productId),
-//).asField<Long>().gt(0)
-
-
-
-
-//fun createOrUpdateReservation(storeId: String, productId: String, userId: String, amountToReserve: Long): Int {
-//    val now = OffsetDateTime.now(ZoneOffset.UTC)
-//
-//    val currentReservedStockSubquery =
-//
-//        return jooq.insertInto(
-//            STORE_STOCK_RESERVATION,
-//            STORE_STOCK_RESERVATION.STORE_ID,
-//            STORE_STOCK_RESERVATION.PRODUCT_ID,
-//            STORE_STOCK_RESERVATION.USER_ID,
-//            STORE_STOCK_RESERVATION.RESERVED_STOCK,
-//            STORE_STOCK_RESERVATION.EXPIRES_AT,
-//            STORE_STOCK_RESERVATION.CREATED_TIMESTAMP_UTC,
-//            STORE_STOCK_RESERVATION.MODIFIED_TIMESTAMP_UTC,
-//        ).select(
-//            select(
-//                value(storeId),
-//                value(productId),
-//                value(userId),
-//                value(amountToReserve),
-//                value(now.plus(StockRepository.DEFAULT_STOCK_RESERVATION_EXPIRATION)),
-//                value(now),
-//                value(now),
-//            ).where(
-//                select(DSL.sum(STORE_STOCK.STOCK))
-//                    .from(STORE_STOCK)
-//                    .where(
-//                        STORE_STOCK.STORE_ID.eq(storeId),
-//                        STORE_STOCK.PRODUCT_ID.eq(productId),
-//                    ).asField<Long>().gt(
-//                        select(DSL.sum(STORE_STOCK_RESERVATION.RESERVED_STOCK))
-//                            .from(STORE_STOCK_RESERVATION)
-//                            .where(
-//                                STORE_STOCK_RESERVATION.STORE_ID.eq(storeId),
-//                                STORE_STOCK_RESERVATION.PRODUCT_ID.eq(productId),
-//                                STORE_STOCK_RESERVATION.EXPIRES_AT.gt(now)
-//                            ).asField<Long>()
-//                    )
-//            )
-//        ).execute()
-//}
-//}
