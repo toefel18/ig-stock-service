@@ -14,7 +14,15 @@ To generate the classes:
 
 To run the code generation, simply run:
 
-    ./gradlew codegen
+    ./gradlew codegen. 
+
+  > If you happen to run into the error:
+  > 
+  > Execution failed for task ':jooqCodegenPostgresContainer'.
+  > ` Status 404: {"message":"No such image: postgres:16.4"}`
+  > 
+  > Then run this command in a terminal and retry: `docker pull postgres:16.4` 
+
 
 ### Running locally
 

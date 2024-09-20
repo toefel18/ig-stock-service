@@ -90,7 +90,7 @@ tasks.withType<Test> {
 }
 
 val jooqCodegenPostgresContainer by tasks.creating(DockerCreateContainer::class) {
-    targetImageId("postgres:16.3")
+    targetImageId("postgres:16.4")
     containerName.set("gradle-jooq-postgres-codegen")
     hostConfig.portBindings.set(listOf("9199:5432"))
     envVars.put("POSTGRES_DB", "stock")
