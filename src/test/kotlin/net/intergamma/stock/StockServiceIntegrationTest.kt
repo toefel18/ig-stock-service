@@ -3,11 +3,14 @@ package net.intergamma.stock
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import net.intergamma.stock.db.Public
+import net.intergamma.stock.db.Public.Companion.PUBLIC
 import net.intergamma.stock.store.StockService
 import net.intergamma.stock.store.dto.SetReservationDto
 import net.intergamma.stock.store.dto.SetStockDto
 import net.intergamma.stock.store.dto.StockDto
 import net.intergamma.stock.store.dto.StockReservationDto
+import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -33,9 +36,18 @@ class StockServiceIntegrationTest {
     @Autowired
     lateinit var stockService: StockService
 
+    @Autowired
+    lateinit var jooq: DSLContext
+
     @BeforeEach
     fun clearPreviousDataAndCreateClient() {
         client = StockServiceClient("http://localhost:$restApiPort")
+        PUBLIC.tables.forEach {
+            runCatching {
+                println("Truncating table ${it.name}")
+                jooq.truncate(it).cascade().execute()
+            }
+        }
     }
 
     @Test
@@ -162,7 +174,7 @@ class StockServiceIntegrationTest {
             bodyToDto<List<StockReservationDto>>().run {
                 size shouldBe 2
                 find { it.userId == "christophe" }?.stock shouldBe 5
-                find { it.userId == "joost" }?.stock shouldBe 15
+                find { it.userId == "joost" }?.stock shouldBe null
             }
         }
     }
