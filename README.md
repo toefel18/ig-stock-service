@@ -21,7 +21,7 @@ To run the code generation, simply run:
 
 1. To run the application locally, you first need to start the database 
 
-    docker run --name igstock --restart unless-stopped -p 9192:5432 -e POSTGRES_USER=stock -e POSTGRES_PASSWORD=stock -d postgres:16.3
+    docker run --name igstock --restart unless-stopped -p 9192:5432 -e POSTGRES_USER=stock -e POSTGRES_PASSWORD=stock -d postgres:17.5
 
 2. To start the application use `./gradlew bootRun` or run StockServiceApplication from within your IDE
 
