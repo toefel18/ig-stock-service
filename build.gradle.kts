@@ -135,8 +135,9 @@ tasks.create("codegen") {
     description = "Generates code based on the db/migrations directory in the src/main/resources folder by creating a postgresql container, running flyway and executing the codegen."
 
     dependsOn(startMyAppContainer)
-    dependsOn(flywayMigrate)
     finalizedBy(deleteMyAppContainer)
+    dependsOn(flywayMigrate)
+
 
     flywayMigrate.configure {
         mustRunAfter(startMyAppContainer)
