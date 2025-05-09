@@ -15,32 +15,32 @@ import org.jooq.impl.UpdatableRecordImpl
 /**
  * Stock of a product in a store
  */
-@Suppress("UNCHECKED_CAST")
-open class StoreStockReservationRecord() : UpdatableRecordImpl<StoreStockReservationRecord>(StoreStockReservation.STORE_STOCK_RESERVATION) {
+@Suppress("warnings")
+open class StoreStockReservationRecord private constructor() : UpdatableRecordImpl<StoreStockReservationRecord>(StoreStockReservation.STORE_STOCK_RESERVATION) {
 
     open var id: Long?
         set(value): Unit = set(0, value)
         get(): Long? = get(0) as Long?
 
-    open var storeId: String?
+    open var storeId: String
         set(value): Unit = set(1, value)
-        get(): String? = get(1) as String?
+        get(): String = get(1) as String
 
-    open var productId: String?
+    open var productId: String
         set(value): Unit = set(2, value)
-        get(): String? = get(2) as String?
+        get(): String = get(2) as String
 
-    open var userId: String?
+    open var userId: String
         set(value): Unit = set(3, value)
-        get(): String? = get(3) as String?
+        get(): String = get(3) as String
 
     open var reservedStock: Long?
         set(value): Unit = set(4, value)
         get(): Long? = get(4) as Long?
 
-    open var expiresAt: OffsetDateTime?
+    open var expiresAt: OffsetDateTime
         set(value): Unit = set(5, value)
-        get(): OffsetDateTime? = get(5) as OffsetDateTime?
+        get(): OffsetDateTime = get(5) as OffsetDateTime
 
     open var createdTimestampUtc: OffsetDateTime?
         set(value): Unit = set(6, value)
@@ -59,7 +59,7 @@ open class StoreStockReservationRecord() : UpdatableRecordImpl<StoreStockReserva
     /**
      * Create a detached, initialised StoreStockReservationRecord
      */
-    constructor(id: Long? = null, storeId: String? = null, productId: String? = null, userId: String? = null, reservedStock: Long? = null, expiresAt: OffsetDateTime? = null, createdTimestampUtc: OffsetDateTime? = null, modifiedTimestampUtc: OffsetDateTime? = null): this() {
+    constructor(id: Long? = null, storeId: String, productId: String, userId: String, reservedStock: Long? = null, expiresAt: OffsetDateTime, createdTimestampUtc: OffsetDateTime? = null, modifiedTimestampUtc: OffsetDateTime? = null): this() {
         this.id = id
         this.storeId = storeId
         this.productId = productId
@@ -68,6 +68,6 @@ open class StoreStockReservationRecord() : UpdatableRecordImpl<StoreStockReserva
         this.expiresAt = expiresAt
         this.createdTimestampUtc = createdTimestampUtc
         this.modifiedTimestampUtc = modifiedTimestampUtc
-        resetChangedOnNotNull()
+        resetTouchedOnNotNull()
     }
 }

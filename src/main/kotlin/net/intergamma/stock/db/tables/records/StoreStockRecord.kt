@@ -15,20 +15,20 @@ import org.jooq.impl.UpdatableRecordImpl
 /**
  * Stock of a product in a store
  */
-@Suppress("UNCHECKED_CAST")
-open class StoreStockRecord() : UpdatableRecordImpl<StoreStockRecord>(StoreStock.STORE_STOCK) {
+@Suppress("warnings")
+open class StoreStockRecord private constructor() : UpdatableRecordImpl<StoreStockRecord>(StoreStock.STORE_STOCK) {
 
     open var id: Long?
         set(value): Unit = set(0, value)
         get(): Long? = get(0) as Long?
 
-    open var storeId: String?
+    open var storeId: String
         set(value): Unit = set(1, value)
-        get(): String? = get(1) as String?
+        get(): String = get(1) as String
 
-    open var productId: String?
+    open var productId: String
         set(value): Unit = set(2, value)
-        get(): String? = get(2) as String?
+        get(): String = get(2) as String
 
     open var stock: Long?
         set(value): Unit = set(3, value)
@@ -51,13 +51,13 @@ open class StoreStockRecord() : UpdatableRecordImpl<StoreStockRecord>(StoreStock
     /**
      * Create a detached, initialised StoreStockRecord
      */
-    constructor(id: Long? = null, storeId: String? = null, productId: String? = null, stock: Long? = null, createdTimestampUtc: OffsetDateTime? = null, modifiedTimestampUtc: OffsetDateTime? = null): this() {
+    constructor(id: Long? = null, storeId: String, productId: String, stock: Long? = null, createdTimestampUtc: OffsetDateTime? = null, modifiedTimestampUtc: OffsetDateTime? = null): this() {
         this.id = id
         this.storeId = storeId
         this.productId = productId
         this.stock = stock
         this.createdTimestampUtc = createdTimestampUtc
         this.modifiedTimestampUtc = modifiedTimestampUtc
-        resetChangedOnNotNull()
+        resetTouchedOnNotNull()
     }
 }

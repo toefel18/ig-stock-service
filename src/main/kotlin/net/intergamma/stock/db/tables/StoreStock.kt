@@ -43,7 +43,7 @@ import org.jooq.impl.TableImpl
 /**
  * Stock of a product in a store
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("warnings")
 open class StoreStock(
     alias: Name,
     path: Table<out Record>?,

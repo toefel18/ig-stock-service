@@ -43,7 +43,7 @@ import org.jooq.impl.TableImpl
 /**
  * Stock of a product in a store
  */
-@Suppress("UNCHECKED_CAST")
+@Suppress("warnings")
 open class StoreStockReservation(
     alias: Name,
     path: Table<out Record>?,
@@ -166,20 +166,11 @@ open class StoreStockReservation(
     override fun getUniqueKeys(): List<UniqueKey<StoreStockReservationRecord>> = listOf(STORE_STOCK_RESERVATION_UKEY)
     override fun getReferences(): List<ForeignKey<StoreStockReservationRecord, *>> = listOf(STORE_STOCK_RESERVATION__STORE_STOCK_RESERVATION_STORE_ID_PRODUCT_ID_FKEY)
 
-    private lateinit var _storeStock: StoreStockPath
-
     /**
      * Get the implicit join path to the <code>public.store_stock</code> table.
      */
-    fun storeStock(): StoreStockPath {
-        if (!this::_storeStock.isInitialized)
-            _storeStock = StoreStockPath(this, STORE_STOCK_RESERVATION__STORE_STOCK_RESERVATION_STORE_ID_PRODUCT_ID_FKEY, null)
-
-        return _storeStock;
-    }
-
-    val storeStock: StoreStockPath
-        get(): StoreStockPath = storeStock()
+    fun storeStock(): StoreStockPath = storeStock
+    val storeStock: StoreStockPath by lazy { StoreStockPath(this, STORE_STOCK_RESERVATION__STORE_STOCK_RESERVATION_STORE_ID_PRODUCT_ID_FKEY, null) }
     override fun `as`(alias: String): StoreStockReservation = StoreStockReservation(DSL.name(alias), this)
     override fun `as`(alias: Name): StoreStockReservation = StoreStockReservation(alias, this)
     override fun `as`(alias: Table<*>): StoreStockReservation = StoreStockReservation(alias.qualifiedName, this)

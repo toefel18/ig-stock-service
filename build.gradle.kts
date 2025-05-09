@@ -2,6 +2,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerRemoveContainer
 import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerPullImage
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jooq.codegen.GenerationTool
 import org.jooq.meta.jaxb.Configuration
 import org.jooq.meta.jaxb.Database
@@ -10,22 +12,25 @@ import org.jooq.meta.jaxb.Generator
 import org.jooq.meta.jaxb.Jdbc
 import org.jooq.meta.jaxb.Target
 
+val postgresVersion = "17.5"
+val jooqVersion = "3.20.3"
+val springDocVersion = "2.8.6"
 
 plugins {
-    id("org.springframework.boot") version "3.2.5"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.23"
-    kotlin("plugin.spring") version "1.9.23"
+    id("org.springframework.boot") version "3.4.5"
+    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm") version "2.1.0"
+    kotlin("plugin.spring") version "2.1.0"
 
     // Plugins required for code generation of JOOQ
-    id("org.jooq.jooq-codegen-gradle") version "3.19.8"
+    id("org.jooq.jooq-codegen-gradle") version "3.20.3"
     id("org.flywaydb.flyway") version "9.16.0"
-    id("com.bmuschko.docker-remote-api") version "7.4.0"
+    id("com.bmuschko.docker-remote-api") version "9.4.0"
 }
 
 buildscript {
     dependencies {
-        classpath("org.postgresql:postgresql:42.6.2")
+        classpath("org.postgresql:postgresql:42.7.5")
     }
 }
 
@@ -46,23 +51,24 @@ dependencies {
         exclude(group = "org.jooq", module = "jooq")
     }
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     implementation("org.postgresql:postgresql")
-    implementation("org.jooq:jooq:3.19.8")
-    implementation("org.jooq:jooq-codegen:3.19.8")
-    implementation("org.jooq:jooq-meta:3.19.8")
-    implementation("org.jooq:jooq-kotlin:3.19.8")
-    implementation("org.jooq:jooq-kotlin-coroutines:3.19.8")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
+    implementation("org.jooq:jooq:$jooqVersion")
+    implementation("org.jooq:jooq-codegen:$jooqVersion")
+    implementation("org.jooq:jooq-meta:$jooqVersion")
+    implementation("org.jooq:jooq-kotlin:$jooqVersion")
+    implementation("org.jooq:jooq-kotlin-coroutines:$jooqVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-common:$springDocVersion")
 
     jooqCodegen("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:5.9.0")
-    testImplementation("org.testcontainers:testcontainers:1.19.7")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:5.9.1")
+    testImplementation("org.testcontainers:testcontainers:1.21.0")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -79,9 +85,8 @@ flyway {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += "-Xjsr305=strict"
-        jvmTarget = "21"
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
@@ -89,8 +94,13 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+val pullPostgresImage by tasks.creating(DockerPullImage::class) {
+    image.set("postgres:$postgresVersion")
+}
+
 val jooqCodegenPostgresContainer by tasks.creating(DockerCreateContainer::class) {
-    targetImageId("postgres:16.4")
+    dependsOn(pullPostgresImage)
+    targetImageId("postgres:$postgresVersion")
     containerName.set("gradle-jooq-postgres-codegen")
     hostConfig.portBindings.set(listOf("9199:5432"))
     envVars.put("POSTGRES_DB", "stock")
@@ -122,6 +132,7 @@ val flywayMigrate = tasks.named("flywayMigrate")
  */
 tasks.create("codegen") {
     description = "Generates code based on the db/migrations directory in the src/main/resources folder by creating a postgresql container, running flyway and executing the codegen."
+
     dependsOn(startMyAppContainer)
     dependsOn(flywayMigrate)
     finalizedBy(deleteMyAppContainer)
@@ -148,8 +159,10 @@ tasks.create("codegen") {
                             Generate()
                                 .withPojosAsKotlinDataClasses(true)
                                 .withKotlinNotNullPojoAttributes(true)
+                                .withKotlinNotNullRecordAttributes(true)
                                 .withKotlinSetterJvmNameAnnotationsOnIsPrefix(true)
                                 .withImplicitJoinPathsAsKotlinProperties(true)
+                                .withFluentSetters(true)
                         )
                         .withDatabase(
                             Database()
