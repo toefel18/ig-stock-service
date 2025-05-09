@@ -24,13 +24,14 @@ plugins {
 
     // Plugins required for code generation of JOOQ
     id("org.jooq.jooq-codegen-gradle") version "3.20.3"
-    id("org.flywaydb.flyway") version "9.16.0"
+    id("org.flywaydb.flyway") version "11.8.1"
     id("com.bmuschko.docker-remote-api") version "9.4.0"
 }
 
 buildscript {
     dependencies {
         classpath("org.postgresql:postgresql:42.7.5")
+        classpath("org.flywaydb:flyway-database-postgresql:11.8.1")
     }
 }
 
